@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ArduinoCNC</name>
+	<name>SerialTest</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>RXTXcomm.jar</name>
-			<type>1</type>
-			<locationURI>PROJECT_LOC/rxtx-2.1-7-bins-r2/RXTXcomm.jar</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>
