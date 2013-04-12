@@ -1,0 +1,7 @@
+supported G-code reference according to FANUC standards
+
+G00		Rapid positioning
+G01		Linear interpolarisation
+G02		Circular interpolation, clockwise
+G03		Circular interpolation, counterclockwise
+G04		Dwell (in ms)
