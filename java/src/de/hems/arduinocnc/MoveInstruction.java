@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import javax.vecmath.Vector3d;
 
-
 public class MoveInstruction implements Instruction {
 	protected double x;
 	protected double y;

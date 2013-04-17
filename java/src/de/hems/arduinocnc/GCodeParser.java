@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.vecmath.Point3d;
+import javax.vecmath.Point3f;
 import javax.vecmath.Vector3d;
 
 /**
@@ -54,8 +54,14 @@ public class GCodeParser {
 	
 	//protected ArrayList<String> issues			= new ArrayList<String>();
 	
+	//DEBUGGING
+	protected boolean debug						= true;
+	public ArrayList<Point3d> debugPoints	= new ArrayList<Point3d>();
+	
 	public GCodeParser() {
+		this.current_line = new Line(-1);
 		
+		this.debugPoints.add(new Point3d(0,0,0));
 	}
 	
 	/**
@@ -69,7 +75,7 @@ public class GCodeParser {
 		//empty gcode:
 		this.gcode_text.clear();
 		
-	    BufferedReader reader	= new BufferedReader( new FileReader (file));
+	    BufferedReader reader	= new BufferedReader(new FileReader(file));
 	    String line				= null;
 	    
 	    while((line = reader.readLine()) != null) {
@@ -132,14 +138,6 @@ public class GCodeParser {
 			String rest	= token.substring(1); 
 			
 			switch(flag) {
-				case 'G':
-					//System.out.println("G-code of type: " + rest);
-					this.current_line.add(new ConfigurationInstruction(flag + "", rest));
-					break;
-				case 'M':
-					//System.out.println("M-code of type: " + rest);
-					this.current_line.add(new ConfigurationInstruction(flag + "", rest));
-					break;
 				case 'N':
 					if(this.current_line != null) {
 						this.program.add(this.current_line);
@@ -151,8 +149,14 @@ public class GCodeParser {
 				case 'Z':
 					index = this.completeLinearXYZ(index);
 					break;
+				case 'G':
+				case 'M':
+				case 'F':
+					//PlainInstructionTranslator pit = new PlainInstructionTranslator(flag, rest);
+					//this.current_line.add(new PlainInstruction(pit.translate(), pit.getValue()));
+					
+					this.current_line.add(new ConfigurationInstruction(flag + "", rest));
 				default:
-					//System.out.println("Argument " + flag + " with value: " + rest);
 					this.current_line.add(new ConfigurationInstruction(flag + "", rest));
 					break;
 			}
@@ -166,7 +170,7 @@ public class GCodeParser {
 		boolean do_continue = true;
 		HashMap<Character, Double> caught = new HashMap<Character, Double>();
 		
-		while(do_continue) {
+		while(do_continue && index < this.gcode_parsed.size()) {
 			String token = this.gcode_parsed.get(index);
 			
 			char flag	= token.charAt(0);
@@ -188,15 +192,19 @@ public class GCodeParser {
 					break;
 			}
 			
+			/*
+			if(do_continue) {
+				index++;		//<-- this is the right solution. but still needs testing for adoptions
+			}
+			*/
+			
 			index++;
+			
 			//maximal 3 achsen pro 3-Tupel
 			if((index - start_index) > 3) {
 				do_continue = false;
 			}
 		}
-		
-		index--;
-		index--;	//TODO <-- why is that?
 		
 		//nicht vorhandene auffüllen:
 		if(caught.containsKey('X')) {
@@ -217,6 +225,11 @@ public class GCodeParser {
 			this.position_next.z = this.position_current.z;
 		}
 		
+		//debugging:
+		if(this.debug) {
+			this.debugPoints.add(new Point3d(this.position_next));
+		}
+		
 		this.position_delta.x = this.roundToPrecision(this.position_next.x - this.position_current.x, 3);
 		this.position_delta.y = this.roundToPrecision(this.position_next.y - this.position_current.y, 3);
 		this.position_delta.z = this.roundToPrecision(this.position_next.z - this.position_current.z, 3);
@@ -228,6 +241,14 @@ public class GCodeParser {
 		mi.setRevPerMM_Z(200);
 		//System.out.println(mi.getArduinoStack().toString());
 		this.current_line.add(mi);
+		
+		//TODO find cleaner solution?! check why index has to be decreased two times
+		if(index == this.gcode_parsed.size()) {
+			return index;
+		}
+		
+		index--;
+		index--;	//TODO <-- why is that?
 		
 		return index;
 	}
