@@ -19,6 +19,7 @@ import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.TransparencyAttributes;
+import javax.swing.JPanel;
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
@@ -29,14 +30,14 @@ import com.sun.j3d.utils.geometry.Sphere;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 import com.sun.j3d.utils.universe.ViewingPlatform;
 
-public class DebugVisualizer3D {
+public class Visualizer3D extends JPanel {
 	protected ArrayList<Point3d> points;
 
-	public DebugVisualizer3D() {
+	public Visualizer3D() {
 		this.points = new ArrayList<Point3d>();
 	}
 
-	public DebugVisualizer3D(ArrayList<Point3d> points) {
+	public Visualizer3D(ArrayList<Point3d> points) {
 		this.points = points;
 	}
 

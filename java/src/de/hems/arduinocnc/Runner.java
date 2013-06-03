@@ -1,44 +1,78 @@
 package de.hems.arduinocnc;
 
+import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import javax.media.j3d.Appearance;
-import javax.media.j3d.BranchGroup;
-import javax.media.j3d.GeometryArray;
-import javax.media.j3d.LineAttributes;
-import javax.media.j3d.PointArray;
-import javax.media.j3d.PointAttributes;
-import javax.media.j3d.Shape3D;
-import javax.vecmath.Color3f;
-import javax.vecmath.Point3d;
-import javax.vecmath.Point3f;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
-import com.sun.j3d.utils.geometry.ColorCube;
-import com.sun.j3d.utils.universe.SimpleUniverse;
-import com.sun.org.apache.xpath.internal.axes.SelfIteratorNoPredicate;
-
+import de.hems.arduinocnc.arduino.SerialWrapper;
+import de.hems.arduinocnc.program.GCodeParser;
+import de.hems.arduinocnc.program.Program;
+import de.hems.arduinocnc.util.MessageConsole;
 
 public class Runner {
+	protected GCodeParser	gcp	= new GCodeParser();
+	protected ConfigReader	cr	= new ConfigReader();
+	protected SerialWrapper	sw	= new SerialWrapper();
+	protected Program 		p;
+	
 	public static void main(String[] args) throws Exception {
-		GCodeParser gcp = new GCodeParser();
+		new Runner();
+	}
+	
+	public Runner() {
+		//change the look and feel to default settings
+		try {
+		  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+		
+		/*
+		MainModel		model		= new MainModel();
+		MainView		view		= new MainView();
+		
+		//redirect stdout and stderr to log
+		MessageConsole mc = new MessageConsole(view.taLog);
+		mc.redirectOut();
+		mc.redirectErr(Color.RED, null);
+		mc.setMessageLines(100);
+		
+		MainController	controller	= new MainController(model, view);
+		*/
+		
+		gcp = new GCodeParser();
+		
+		//File file = new File("C:\\Users\\Anticom\\Documents\\Arduino\\ArduinoCNC\\java\\src\\xyzcurve.txt");
+		File file = new File("C:\\Users\\Anticom\\Documents\\Arduino\\ArduinoCNC\\java\\src\\air_show_picture.txt");
 		
 		try {
-			//gcp.readFromFile("C:\\Users\\Anticom\\Documents\\Arduino\\ArduinoCNC\\java\\src\\xyzcurve.txt");
-			gcp.readFromFile("C:\\Users\\Anticom\\Documents\\Arduino\\ArduinoCNC\\java\\src\\air_show_picture.txt");
+			gcp.readFromFile(file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		/*
+		view.taGcode.setText("");
+		for(String s: gcp.getGcode_text()) {
+			view.taGcode.append(s + "\n");
+		}
+		*/
+		
 		//parse
-		gcp.prepare();
+		gcp.parse();
 		//parsing done
 		
-		//Instructor instructor = new Instructor(gcp.program);
+		//gcp.program.start();
 		
+		//Instructor instructor = new Instructor(gcp.program);
 		//---------------------------------------------------------------
-		double scale = /*0.05*/1;
+		
+		//double scale = 0.05;
+		double scale = 1;
 		for(int i = 0; i < gcp.debugPoints.size(); i++) {
 			gcp.debugPoints.get(i).scale(scale);
 		}
@@ -48,7 +82,7 @@ public class Runner {
 		boolean aliased	= true;
 		boolean showCoordinateSystem = true;
 		boolean showSimulation = true;
-		//visual.renderPointCloud(gcp.debugPoints, pointSize, aliased, showCoordinateSystem);
+		//visual.renderPointCloud(gcp.debugPoints, pointSize, aliased, showCoordinateSystem, showSimulation);
 		visual.renderLinePath(gcp.debugPoints, pointSize, aliased, showCoordinateSystem, showSimulation);
 		
 	}
